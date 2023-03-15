@@ -7,7 +7,7 @@ export const CollectionReducer = (state,action) => {
         case ADD_COLLECTION_ITEM:
             return {
                 ...state,
-                collection:[...state.collection,...action.payload]
+                collection:[...state.collection,...action.payload]  
             };
 
         case REMOVE_COLLECTION_ITEM:

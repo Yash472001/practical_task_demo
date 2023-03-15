@@ -1,7 +1,10 @@
-import React, { useContext, useRef } from 'react'
-import { handleCreateCollection } from '../apicalls/crudApiCall';
+import React, { useContext, useRef ,useEffect} from 'react'
+import { useMutation } from '@apollo/client';
 import { addCollectionItem } from '../context/CollectionActions';
 import { CollectionContext } from '../context/CollectionContext';
+import { CREATE_COLLECTION } from '../graphql/queryMutation';
+
+
 
 const AddCollection = () => {
 
@@ -9,6 +12,14 @@ const AddCollection = () => {
   const addressRef = useRef();
 
   const {dispatch}  = useContext(CollectionContext);
+  const [createCollection, { data, loading, error }] = useMutation(CREATE_COLLECTION);
+
+  useEffect(() => {
+    if(data){
+      dispatch(addCollectionItem([data.createCollection]))
+    }
+  }, [data])
+  
 
   const handleSubmit = async() => {
     if(!personnameRef.current.value || !addressRef.current.value){
@@ -16,9 +27,7 @@ const AddCollection = () => {
       return
     }
     
-    let response = await handleCreateCollection({name:personnameRef.current.value,address:addressRef.current.value});
-    response = response.data;
-    dispatch(addCollectionItem(response))
+    createCollection({ variables: {input:{name:personnameRef.current.value,address:addressRef.current.value}} });
     resetValue();
   }
 
@@ -27,6 +36,8 @@ const AddCollection = () => {
     addressRef.current.value = ""
   }
 
+  if(loading){return <>Loading.....</>}
+  else if(error) alert("Something went wrong!")
   return (
     <>
         <label htmlFor="personname">Name : </label>

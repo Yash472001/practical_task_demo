@@ -1,6 +1,7 @@
 import axios from "./axiosConfig";
 
-export const getCollections = async(data) => {
+
+export const getCollections = async() => {
     try {
         const res = await axios.get('/api/collections')
         return res.data;

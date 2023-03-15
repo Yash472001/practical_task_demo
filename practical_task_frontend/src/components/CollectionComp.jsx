@@ -1,12 +1,18 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
-import { handleDeleteCollection, handleUpdateCollection } from "../apicalls/crudApiCall";
+import { useMutation } from '@apollo/client';
 import { removeCollectionItem, updateCollectionItem } from "../context/CollectionActions";
 import { CollectionContext } from "../context/CollectionContext";
+import { DELETE_COLLECTION, UPDATE_COLLECTION } from "../graphql/queryMutation";
+
+
 
 const Collectioncomp = ({ data }) => {
   const { dispatch } = useContext(CollectionContext);
   const { name, address, createdAt, _id } = data;
 
+  const [updateCollection, updateData] = useMutation(UPDATE_COLLECTION);
+  const [deleteCollection, deleteData] = useMutation(DELETE_COLLECTION);
+  
   const [editable, setEditable] = useState(false);
 
   const nameEditableRef = useRef();
@@ -17,15 +23,25 @@ const Collectioncomp = ({ data }) => {
       nameEditableRef.current.value = name;
       addressEditableRef.current.value = address;
     }
+    
   }, [editable]);
 
-  const handleDelete = async () => {
-    let response = await handleDeleteCollection(_id);
-    if (response.status !== "OK") {
-      alert("Something went wrong");
-      return;
+  useEffect(() => {
+    if(updateData.data){
+      const data = updateData.data.updateCollection;
+      dispatch(updateCollectionItem(data));
     }
-    dispatch(removeCollectionItem(_id));
+    if(deleteData.data){
+      const data = deleteData.data.deleteCollection;
+      dispatch(removeCollectionItem(data._id));
+    }
+  }, [updateData.data,deleteData.data])
+  
+
+  
+  const handleDelete = async () => {
+    deleteCollection({variables:{id:_id}});
+    
   };
 
   const handleEdit = () => {
@@ -37,9 +53,7 @@ const Collectioncomp = ({ data }) => {
       alert("INPUT BOX CAN NOT BE EMPTY");
       return
     }
-    let response = await handleUpdateCollection(_id,{name:nameEditableRef.current.value,address:addressEditableRef.current.value});
-    response = response.data;
-    dispatch(updateCollectionItem(response));
+    updateCollection({variables:{id:_id,input:{name:nameEditableRef.current.value,address:addressEditableRef.current.value}}})
     resetValue()
     setEditable(false);
   };

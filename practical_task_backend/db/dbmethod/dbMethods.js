@@ -1,6 +1,5 @@
 const UserSchema = require("../schema");
 
-
 async function createCollection(collectiondata) {
     const data = await UserSchema.create(collectiondata);
     return data;
