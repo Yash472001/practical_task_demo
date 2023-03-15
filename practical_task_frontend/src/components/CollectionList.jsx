@@ -11,8 +11,8 @@ const CollectionList = () => {
       {state.collection.length == 0 ?
         <>No Collections</>
       :
-      state.collection.map((val) => {
-        return <Collectioncomp key={val.id} data={val} />;
+      state.collection.map((val,i) => {
+        return <Collectioncomp key={i} data={val} />;
       })}
       
     </div>
