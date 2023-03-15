@@ -28,7 +28,7 @@ startServer();
 app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
 
-app.use(router);
+// app.use(router);
 
 
 
